@@ -3,8 +3,7 @@ library flutter_datetime_picker;
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter_datetime_picker/src/datetime_picker_theme.dart';
+import 'package:flutter_datetime_picker/src/datetime_picker_theme.dart' as dpt;
 import 'package:flutter_datetime_picker/src/date_model.dart';
 import 'package:flutter_datetime_picker/src/i18n_model.dart';
 
@@ -30,7 +29,7 @@ class DatePicker {
     DateCancelledCallback? onCancel,
     locale: LocaleType.en,
     DateTime? currentTime,
-    DatePickerTheme? theme,
+    dpt.DatePickerTheme? theme,
   }) async {
     return await Navigator.push(
       context,
@@ -65,7 +64,7 @@ class DatePicker {
     DateCancelledCallback? onCancel,
     locale: LocaleType.en,
     DateTime? currentTime,
-    DatePickerTheme? theme,
+    dpt.DatePickerTheme? theme,
   }) async {
     return await Navigator.push(
       context,
@@ -98,7 +97,7 @@ class DatePicker {
     DateCancelledCallback? onCancel,
     locale: LocaleType.en,
     DateTime? currentTime,
-    DatePickerTheme? theme,
+    dpt.DatePickerTheme? theme,
   }) async {
     return await Navigator.push(
       context,
@@ -132,7 +131,7 @@ class DatePicker {
     DateCancelledCallback? onCancel,
     locale: LocaleType.en,
     DateTime? currentTime,
-    DatePickerTheme? theme,
+    dpt.DatePickerTheme? theme,
   }) async {
     return await Navigator.push(
       context,
@@ -166,7 +165,7 @@ class DatePicker {
     DateCancelledCallback? onCancel,
     locale: LocaleType.en,
     BasePickerModel? pickerModel,
-    DatePickerTheme? theme,
+    dpt.DatePickerTheme? theme,
   }) async {
     return await Navigator.push(
       context,
@@ -191,13 +190,13 @@ class _DatePickerRoute<T> extends PopupRoute<T> {
     this.onChanged,
     this.onConfirm,
     this.onCancel,
-    DatePickerTheme? theme,
+    dpt.DatePickerTheme? theme,
     this.barrierLabel,
     this.locale,
     RouteSettings? settings,
     BasePickerModel? pickerModel,
   })  : this.pickerModel = pickerModel ?? DatePickerModel(),
-        this.theme = theme ?? DatePickerTheme(),
+        this.theme = theme ?? dpt.DatePickerTheme(),
         super(settings: settings);
 
   final bool? showTitleActions;
@@ -205,7 +204,7 @@ class _DatePickerRoute<T> extends PopupRoute<T> {
   final DateChangedCallback? onConfirm;
   final DateCancelledCallback? onCancel;
   final LocaleType? locale;
-  final DatePickerTheme theme;
+  final dpt.DatePickerTheme theme;
   final BasePickerModel pickerModel;
 
   @override
@@ -293,7 +292,7 @@ class _DatePickerState extends State<_DatePickerComponent> {
 
   @override
   Widget build(BuildContext context) {
-    DatePickerTheme theme = widget.route.theme;
+    dpt.DatePickerTheme theme = widget.route.theme;
     return GestureDetector(
       child: AnimatedBuilder(
         animation: widget.route.animation!,
@@ -309,7 +308,7 @@ class _DatePickerState extends State<_DatePickerComponent> {
               ),
               child: GestureDetector(
                 child: Material(
-                  color: theme.backgroundColor,
+                  color: theme.backgroundColor ?? Colors.white,
                   child: _renderPickerView(theme),
                 ),
               ),
@@ -326,7 +325,7 @@ class _DatePickerState extends State<_DatePickerComponent> {
     }
   }
 
-  Widget _renderPickerView(DatePickerTheme theme) {
+  Widget _renderPickerView(dpt.DatePickerTheme theme) {
     Widget itemView = _renderItemView(theme);
     if (widget.route.showTitleActions == true) {
       return Column(
@@ -341,7 +340,7 @@ class _DatePickerState extends State<_DatePickerComponent> {
 
   Widget _renderColumnView(
     ValueKey key,
-    DatePickerTheme theme,
+    dpt.DatePickerTheme theme,
     StringAtIndexCallBack stringAtIndexCB,
     ScrollController scrollController,
     int layoutProportion,
@@ -396,82 +395,79 @@ class _DatePickerState extends State<_DatePickerComponent> {
     );
   }
 
-  Widget _renderItemView(DatePickerTheme theme) {
+  Widget _renderItemView(dpt.DatePickerTheme theme) {
     return Container(
       color: theme.backgroundColor,
-      child: Directionality(
-        textDirection: TextDirection.ltr,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Container(
-              child: widget.pickerModel.layoutProportions()[0] > 0
-                  ? _renderColumnView(
-                      ValueKey(widget.pickerModel.currentLeftIndex()),
-                      theme,
-                      widget.pickerModel.leftStringAtIndex,
-                      leftScrollCtrl,
-                      widget.pickerModel.layoutProportions()[0], (index) {
-                      widget.pickerModel.setLeftIndex(index);
-                    }, (index) {
-                      setState(() {
-                        refreshScrollOffset();
-                        _notifyDateChanged();
-                      });
-                    })
-                  : null,
-            ),
-            Text(
-              widget.pickerModel.leftDivider(),
-              style: theme.itemStyle,
-            ),
-            Container(
-              child: widget.pickerModel.layoutProportions()[1] > 0
-                  ? _renderColumnView(
-                      ValueKey(widget.pickerModel.currentLeftIndex()),
-                      theme,
-                      widget.pickerModel.middleStringAtIndex,
-                      middleScrollCtrl,
-                      widget.pickerModel.layoutProportions()[1], (index) {
-                      widget.pickerModel.setMiddleIndex(index);
-                    }, (index) {
-                      setState(() {
-                        refreshScrollOffset();
-                        _notifyDateChanged();
-                      });
-                    })
-                  : null,
-            ),
-            Text(
-              widget.pickerModel.rightDivider(),
-              style: theme.itemStyle,
-            ),
-            Container(
-              child: widget.pickerModel.layoutProportions()[2] > 0
-                  ? _renderColumnView(
-                      ValueKey(widget.pickerModel.currentMiddleIndex() * 100 +
-                          widget.pickerModel.currentLeftIndex()),
-                      theme,
-                      widget.pickerModel.rightStringAtIndex,
-                      rightScrollCtrl,
-                      widget.pickerModel.layoutProportions()[2], (index) {
-                      widget.pickerModel.setRightIndex(index);
-                    }, (index) {
-                      setState(() {
-                        refreshScrollOffset();
-                        _notifyDateChanged();
-                      });
-                    })
-                  : null,
-            ),
-          ],
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Container(
+            child: widget.pickerModel.layoutProportions()[0] > 0
+                ? _renderColumnView(
+                    ValueKey(widget.pickerModel.currentLeftIndex()),
+                    theme,
+                    widget.pickerModel.leftStringAtIndex,
+                    leftScrollCtrl,
+                    widget.pickerModel.layoutProportions()[0], (index) {
+                    widget.pickerModel.setLeftIndex(index);
+                  }, (index) {
+                    setState(() {
+                      refreshScrollOffset();
+                      _notifyDateChanged();
+                    });
+                  })
+                : null,
+          ),
+          Text(
+            widget.pickerModel.leftDivider(),
+            style: theme.itemStyle,
+          ),
+          Container(
+            child: widget.pickerModel.layoutProportions()[1] > 0
+                ? _renderColumnView(
+                    ValueKey(widget.pickerModel.currentLeftIndex()),
+                    theme,
+                    widget.pickerModel.middleStringAtIndex,
+                    middleScrollCtrl,
+                    widget.pickerModel.layoutProportions()[1], (index) {
+                    widget.pickerModel.setMiddleIndex(index);
+                  }, (index) {
+                    setState(() {
+                      refreshScrollOffset();
+                      _notifyDateChanged();
+                    });
+                  })
+                : null,
+          ),
+          Text(
+            widget.pickerModel.rightDivider(),
+            style: theme.itemStyle,
+          ),
+          Container(
+            child: widget.pickerModel.layoutProportions()[2] > 0
+                ? _renderColumnView(
+                    ValueKey(widget.pickerModel.currentMiddleIndex() * 100 +
+                        widget.pickerModel.currentLeftIndex()),
+                    theme,
+                    widget.pickerModel.rightStringAtIndex,
+                    rightScrollCtrl,
+                    widget.pickerModel.layoutProportions()[2], (index) {
+                    widget.pickerModel.setRightIndex(index);
+                  }, (index) {
+                    setState(() {
+                      refreshScrollOffset();
+                      _notifyDateChanged();
+                    });
+                  })
+                : null,
+          ),
+        ],
       ),
     );
   }
 
   // Title View
-  Widget _renderTitleActionsView(DatePickerTheme theme) {
+  Widget _renderTitleActionsView(dpt.DatePickerTheme theme) {
     final done = _localeDone();
     final cancel = _localeCancel();
 
@@ -487,7 +483,7 @@ class _DatePickerState extends State<_DatePickerComponent> {
             height: theme.titleHeight,
             child: CupertinoButton(
               pressedOpacity: 0.3,
-              padding: EdgeInsetsDirectional.only(start: 16, top: 0),
+              padding: EdgeInsets.only(left: 16, top: 0),
               child: Text(
                 '$cancel',
                 style: theme.cancelStyle,
@@ -504,7 +500,7 @@ class _DatePickerState extends State<_DatePickerComponent> {
             height: theme.titleHeight,
             child: CupertinoButton(
               pressedOpacity: 0.3,
-              padding: EdgeInsetsDirectional.only(end: 16, top: 0),
+              padding: EdgeInsets.only(right: 16, top: 0),
               child: Text(
                 '$done',
                 style: theme.doneStyle,
@@ -543,7 +539,7 @@ class _BottomPickerLayout extends SingleChildLayoutDelegate {
   final double progress;
   final int? itemCount;
   final bool? showTitleActions;
-  final DatePickerTheme theme;
+  final dpt.DatePickerTheme theme;
   final double bottomPadding;
 
   @override
